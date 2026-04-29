@@ -42,7 +42,7 @@ namespace CupkekGames.PackageManager.Editor
         {
             new Entry("com.cupkekgames.singleton",       "Singleton",       PackageTags.GameFull),
             new Entry("com.cupkekgames.pool",            "Pool",            PackageTags.GameFull),
-            new Entry("com.cupkekgames.fadeable",        "Fadeable",        PackageTags.GameFull),
+            new Entry("com.cupkekgames.fadeables",        "Fadeable",        PackageTags.GameFull),
             new Entry("com.cupkekgames.keyvaluedatabase","KeyValueDatabase",PackageTags.GameFull),
             new Entry("com.cupkekgames.prefabloader",    "PrefabLoader",    PackageTags.GameFull),
             new Entry("com.cupkekgames.assetfinder",     "AssetFinder",     PackageTags.GameFull),
