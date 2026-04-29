@@ -40,11 +40,11 @@ namespace CupkekGames.PackageManager.Editor
         // Order matters: leaf deps first, packages that depend on them after.
         public static readonly Entry[] Entries = new[]
         {
-            new Entry("com.cupkekgames.singleton",       "Singleton",       PackageTags.GameFull),
+            new Entry("com.cupkekgames.singletons",       "Singleton",       PackageTags.GameFull),
             new Entry("com.cupkekgames.pool",            "Pool",            PackageTags.GameFull),
             new Entry("com.cupkekgames.fadeables",        "Fadeable",        PackageTags.GameFull),
-            new Entry("com.cupkekgames.keyvaluedatabase","KeyValueDatabase",PackageTags.GameFull),
-            new Entry("com.cupkekgames.prefabloader",    "PrefabLoader",    PackageTags.GameFull),
+            new Entry("com.cupkekgames.keyvaluedatabases","KeyValueDatabase",PackageTags.GameFull),
+            new Entry("com.cupkekgames.prefabloaders",    "PrefabLoader",    PackageTags.GameFull),
             new Entry("com.cupkekgames.assetfinder",     "AssetFinder",     PackageTags.GameFull),
             new Entry("com.cupkekgames.editorui",        "EditorUI",        PackageTags.GameFull),
             new Entry("com.cupkekgames.editorinspector", "EditorInspector", PackageTags.GameFull),
