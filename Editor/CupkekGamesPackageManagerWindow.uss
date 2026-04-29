@@ -1,0 +1,211 @@
+/* ── Header ── */
+
+.pm-header {
+    padding: 14px 18px 12px 18px;
+    background-color: var(--editor-bg-750);
+    border-bottom-width: 1px;
+    border-bottom-color: var(--editor-border-medium);
+}
+
+.pm-header-title {
+    font-size: 16px;
+    -unity-font-style: bold;
+    color: var(--editor-text-primary);
+    margin-bottom: 4px;
+}
+
+.pm-header-subtitle {
+    font-size: 11px;
+    color: var(--editor-text-muted);
+    white-space: normal;
+    line-height: 1.3;
+}
+
+/* ── Content ── */
+
+.pm-content {
+    flex-grow: 1;
+    padding: 12px 14px;
+    background-color: var(--editor-bg-850);
+}
+
+/* ── Toolbar ── */
+
+.pm-toolbar {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.pm-toolbar-count {
+    flex-direction: row;
+    align-items: center;
+}
+
+.pm-toolbar-count-text {
+    font-size: 12px;
+    -unity-font-style: bold;
+    padding: 4px 10px;
+    border-radius: 10px;
+    border-width: 1px;
+}
+
+.pm-toolbar-count-text--ok {
+    color: var(--editor-success-fg);
+    background-color: var(--editor-success-bg);
+    border-color: var(--editor-success-border);
+}
+
+.pm-toolbar-count-text--missing {
+    color: var(--editor-danger-fg);
+    background-color: var(--editor-danger-bg);
+    border-color: var(--editor-danger-border);
+}
+
+.pm-toolbar-btn {
+    margin-left: 8px;
+    min-height: 26px;
+    padding: 0 12px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-width: 1px;
+    border-color: var(--editor-border-soft);
+    background-color: var(--editor-surface-weak);
+    color: var(--editor-text-secondary);
+}
+
+.pm-toolbar-btn--primary {
+    -unity-font-style: bold;
+    border-color: var(--editor-brand-border);
+    background-color: var(--editor-brand-bg);
+}
+
+.pm-toolbar-btn:disabled {
+    opacity: 0.5;
+}
+
+/* ── Rows ── */
+
+.pm-rows-scroll {
+    flex-grow: 1;
+}
+
+.pm-row {
+    flex-direction: row;
+    align-items: center;
+    padding: 6px 10px;
+    margin-bottom: 4px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: var(--editor-surface-weak);
+    border-width: 1px;
+    border-color: var(--editor-border-soft);
+}
+
+.pm-row--installed {
+    border-color: rgba(73, 204, 91, 0.3);
+}
+
+.pm-row--missing {
+    border-color: rgba(204, 74, 74, 0.3);
+}
+
+.pm-row-icon {
+    width: 10px;
+    height: 10px;
+    min-width: 10px;
+    min-height: 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    margin-right: 10px;
+}
+
+.pm-row-icon--installed {
+    background-color: rgb(73, 204, 91);
+}
+
+.pm-row-icon--missing {
+    background-color: rgb(204, 74, 74);
+}
+
+.pm-row-displayname {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: var(--editor-text-primary);
+    margin-right: 10px;
+    min-width: 110px;
+}
+
+.pm-row-packageid {
+    font-size: 11px;
+    color: var(--editor-text-muted);
+    margin-right: 8px;
+}
+
+.pm-row-tags {
+    flex-direction: row;
+    align-items: center;
+}
+
+.pm-row-tag {
+    font-size: 10px;
+    -unity-font-style: bold;
+    color: var(--editor-text-secondary);
+    background-color: var(--editor-surface-weak);
+    border-color: var(--editor-border-soft);
+    border-width: 1px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    padding: 1px 7px;
+    margin-right: 4px;
+}
+
+.pm-row-version {
+    font-size: 11px;
+    color: var(--editor-text-secondary);
+    margin-right: 4px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    background-color: rgba(255, 255, 255, 0.04);
+}
+
+.pm-row-install-btn {
+    min-width: 80px;
+    min-height: 22px;
+    padding: 0 10px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-width: 1px;
+    border-color: var(--editor-brand-border);
+    background-color: var(--editor-brand-bg);
+    color: var(--editor-text-secondary);
+}
+
+/* ── Misc ── */
+
+.pm-loading-text {
+    font-size: 12px;
+    color: var(--editor-text-muted);
+    -unity-font-style: italic;
+    padding: 8px 10px;
+}
+
+.pm-error-label {
+    font-size: 11px;
+    color: rgb(204, 74, 74);
+    background-color: rgba(204, 74, 74, 0.1);
+    border-radius: 4px;
+    padding: 6px 10px;
+    margin-top: 8px;
+    white-space: normal;
+}
