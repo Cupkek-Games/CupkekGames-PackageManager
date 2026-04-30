@@ -68,6 +68,8 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.navigation",      "Navigation",      PackageTags.GameFull),
             new Entry("com.cupkekgames.quests",          "Quests",          PackageTags.GameFull),
             new Entry("com.cupkekgames.editortools",     "EditorTools",     PackageTags.GameFull),
+            // Phase D — TimeSystem extraction
+            new Entry("com.cupkekgames.timesystem",      "TimeSystem",      PackageTags.GameFull),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>
