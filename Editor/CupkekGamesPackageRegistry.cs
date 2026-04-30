@@ -46,6 +46,7 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.keyvaluedatabases","KeyValueDatabase",PackageTags.GameFull),
             new Entry("com.cupkekgames.prefabloaders",    "PrefabLoader",    PackageTags.GameFull),
             new Entry("com.cupkekgames.assetfinder",     "AssetFinder",     PackageTags.GameFull),
+            new Entry("com.cupkekgames.transforms",      "Transforms",      PackageTags.GameFull),
             new Entry("com.cupkekgames.editorui",        "EditorUI",        PackageTags.GameFull),
             new Entry("com.cupkekgames.editorinspector", "EditorInspector", PackageTags.GameFull),
             new Entry("com.cupkekgames.services",  "ServiceLocator",  PackageTags.GameFull),
@@ -59,6 +60,14 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.sequencer",       "Sequencer",       PackageTags.GameFull),
             new Entry("com.cupkekgames.settings",        "Settings",        PackageTags.GameFull),
             new Entry("com.cupkekgames.inkbridge",             "Ink",             PackageTags.GameFull),
+            // Phase A — extracted from HM Plugins/CupkekGames/, 2026-04-30
+            new Entry("com.cupkekgames.diagnostics",     "Diagnostics",     PackageTags.GameFull),
+            new Entry("com.cupkekgames.textpopup",       "TextPopup",       PackageTags.GameFull),
+            new Entry("com.cupkekgames.audio",           "Audio",           PackageTags.GameFull),
+            new Entry("com.cupkekgames.animations",      "Animations",      PackageTags.GameFull),
+            new Entry("com.cupkekgames.navigation",      "Navigation",      PackageTags.GameFull),
+            new Entry("com.cupkekgames.quests",          "Quests",          PackageTags.GameFull),
+            new Entry("com.cupkekgames.editortools",     "EditorTools",     PackageTags.GameFull),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>
