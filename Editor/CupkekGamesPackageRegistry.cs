@@ -70,6 +70,10 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.editortools",     "EditorTools",     PackageTags.GameFull),
             // Phase D — TimeSystem extraction
             new Entry("com.cupkekgames.timesystem",      "TimeSystem",      PackageTags.GameFull),
+            // Phase C — Tier 2 bridges (third-party plugin adapters)
+            new Entry("com.cupkekgames.textpopup.damagenumberspro", "TextPopup.DamageNumbersPro", PackageTags.GameFull),
+            new Entry("com.cupkekgames.audio.sonity",              "Audio.Sonity",              PackageTags.GameFull),
+            new Entry("com.cupkekgames.animations.animancer",      "Animations.Animancer",      PackageTags.GameFull),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>
