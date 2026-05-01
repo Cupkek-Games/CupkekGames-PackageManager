@@ -74,6 +74,9 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.textpopup.damagenumberspro", "TextPopup.DamageNumbersPro", PackageTags.GameFull),
             new Entry("com.cupkekgames.audio.sonity",              "Audio.Sonity",              PackageTags.GameFull),
             new Entry("com.cupkekgames.animations.animancer",      "Animations.Animancer",      PackageTags.GameFull),
+            // Phase D — BehaviourTrees + StateMachines (pluralized to fix namespace=class collision)
+            new Entry("com.cupkekgames.behaviourtrees",            "BehaviourTrees",            PackageTags.GameFull),
+            new Entry("com.cupkekgames.statemachines",             "StateMachines",             PackageTags.GameFull),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>
