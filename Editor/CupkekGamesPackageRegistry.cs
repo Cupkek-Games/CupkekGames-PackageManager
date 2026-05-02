@@ -77,6 +77,20 @@ namespace CupkekGames.PackageManager.Editor
             // Phase D — BehaviourTrees + StateMachines (pluralized to fix namespace=class collision)
             new Entry("com.cupkekgames.behaviourtrees",            "BehaviourTrees",            PackageTags.GameFull),
             new Entry("com.cupkekgames.statemachines",             "StateMachines",             PackageTags.GameFull),
+            // Phase J — final HM framework extraction batch, 2026-05-02 (13 packages)
+            new Entry("com.cupkekgames.cameras",                   "Cameras",                   PackageTags.GameFull),
+            new Entry("com.cupkekgames.character",                 "Character",                 PackageTags.GameFull),
+            new Entry("com.cupkekgames.units",                     "Units",                     PackageTags.GameFull),
+            new Entry("com.cupkekgames.shapes",                    "Shapes",                    PackageTags.GameFull),
+            new Entry("com.cupkekgames.shapedrawing",              "ShapeDrawing",              PackageTags.GameFull),
+            new Entry("com.cupkekgames.shapedrawing.shapes",       "ShapeDrawing.Shapes",       PackageTags.GameFull),
+            new Entry("com.cupkekgames.vfx",                       "VFX",                       PackageTags.GameFull),
+            new Entry("com.cupkekgames.vfx.mktoon",                "VFX.MKToon",                PackageTags.GameFull),
+            new Entry("com.cupkekgames.vfx.potatoon",              "VFX.PotaToon",              PackageTags.GameFull),
+            new Entry("com.cupkekgames.combat",                    "Combat",                    PackageTags.GameFull),
+            new Entry("com.cupkekgames.inventorysystem.crafting",  "InventorySystem.Crafting",  PackageTags.GameFull),
+            new Entry("com.cupkekgames.inventorysystem.farming",   "InventorySystem.Farming",   PackageTags.GameFull),
+            new Entry("com.cupkekgames.localization",              "Localization",              PackageTags.GameFull),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>
