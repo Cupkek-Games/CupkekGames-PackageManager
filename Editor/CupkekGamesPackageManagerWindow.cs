@@ -14,10 +14,12 @@ namespace CupkekGames.PackageManager.Editor
 
         private VisualElement _headerCount;
         private Button _installGameFullButton;
+        private Button _refreshButton;
         private VisualElement _rowsContainer;
         private Label _errorLabel;
 
         private Dictionary<string, string> _installedPackages;
+        private readonly List<Button> _rowInstallButtons = new();
 
         [MenuItem("Tools/CupkekGames/Package Manager", false, 4)]
         public static CupkekGamesPackageManagerWindow ShowWindow()
@@ -112,10 +114,10 @@ namespace CupkekGames.PackageManager.Editor
             spacer.style.flexGrow = 1f;
             toolbar.Add(spacer);
 
-            Button refreshBtn = new Button(Refresh);
-            refreshBtn.text = "Refresh";
-            refreshBtn.AddToClassList("pm-toolbar-btn");
-            toolbar.Add(refreshBtn);
+            _refreshButton = new Button(Refresh);
+            _refreshButton.text = "Refresh";
+            _refreshButton.AddToClassList("pm-toolbar-btn");
+            toolbar.Add(_refreshButton);
 
             _installGameFullButton = new Button(OnInstallGameFullPackages);
             _installGameFullButton.AddToClassList("pm-toolbar-btn");
@@ -141,6 +143,7 @@ namespace CupkekGames.PackageManager.Editor
             if (_rowsContainer == null) return;
 
             _rowsContainer.Clear();
+            _rowInstallButtons.Clear();
             Label loading = new Label("Detecting installed packages…");
             loading.AddToClassList("pm-loading-text");
             _rowsContainer.Add(loading);
@@ -151,12 +154,23 @@ namespace CupkekGames.PackageManager.Editor
                 BuildRows();
                 UpdateToolbar();
                 UpdateErrorFooter();
+
+                // Re-enable the refresh button (BuildRows / UpdateToolbar handle
+                // their own enable state for install buttons).
+                if (_refreshButton != null) _refreshButton.SetEnabled(true);
+
+                // If an install is still in flight (e.g. user opened the window
+                // mid-install, or refresh fired while AddAndRemove was still
+                // resolving), preserve the busy UI so buttons don't flash live.
+                if (CupkekGamesPackageInstaller.IsAddInFlight)
+                    EnterBusyState(null, "Installing…");
             });
         }
 
         private void BuildRows()
         {
             _rowsContainer.Clear();
+            _rowInstallButtons.Clear();
 
             CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull);
             foreach (CupkekGamesPackageRegistry.Entry entry in entries)
@@ -217,11 +231,13 @@ namespace CupkekGames.PackageManager.Editor
             else
             {
                 string installId = entry.PackageId;
-                Button install = new Button(() => OnInstallSingle(installId));
+                Button install = null;
+                install = new Button(() => OnInstallSingle(installId, install));
                 install.text = "Install";
                 install.AddToClassList("pm-row-install-btn");
                 install.tooltip = installId;
                 row.Add(install);
+                _rowInstallButtons.Add(install);
             }
 
             return row;
@@ -265,8 +281,9 @@ namespace CupkekGames.PackageManager.Editor
             _errorLabel.style.display = DisplayStyle.Flex;
         }
 
-        private void OnInstallSingle(string packageId)
+        private void OnInstallSingle(string packageId, Button activeButton)
         {
+            EnterBusyState(activeButton, "Installing…");
             CupkekGamesPackageInstaller.InstallByPackageId(packageId, (ok, msg) =>
             {
                 if (!ok)
@@ -286,6 +303,7 @@ namespace CupkekGames.PackageManager.Editor
                 .ToList();
             if (ids.Count == 0) return;
 
+            EnterBusyState(_installGameFullButton, $"Installing {ids.Count} package(s)…");
             CupkekGamesPackageInstaller.InstallByPackageIds(ids, (ok, msg) =>
             {
                 if (!ok)
@@ -297,6 +315,47 @@ namespace CupkekGames.PackageManager.Editor
             // Single Client.AddAndRemove call → one manifest write, one domain
             // reload, all transitive deps within com.cupkekgames scope resolve
             // atomically via the scoped registry.
+        }
+
+        // ─────────────────────────────────────────
+        //  Busy state
+        // ─────────────────────────────────────────
+
+        /// <summary>
+        /// Disable every install action and visibly mark <paramref name="activeButton"/>
+        /// (if non-null) as the in-flight one with <paramref name="busyText"/>. The next
+        /// <see cref="Refresh"/> rebuilds rows and naturally exits busy state — installed
+        /// packages render as version-tagged rows; still-missing ones get fresh enabled
+        /// install buttons.
+        /// </summary>
+        private void EnterBusyState(Button activeButton, string busyText)
+        {
+            if (_installGameFullButton != null)
+            {
+                _installGameFullButton.SetEnabled(false);
+                if (activeButton == _installGameFullButton)
+                    _installGameFullButton.text = busyText;
+            }
+
+            if (_refreshButton != null)
+                _refreshButton.SetEnabled(false);
+
+            for (int i = 0; i < _rowInstallButtons.Count; i++)
+            {
+                Button b = _rowInstallButtons[i];
+                if (b == null) continue;
+                b.SetEnabled(false);
+                if (b == activeButton) b.text = busyText;
+            }
+
+            // Toolbar count gets a subtle "(working…)" suffix so the user has a
+            // top-of-window indicator even when the in-flight button is offscreen.
+            if (_headerCount != null && _headerCount.childCount > 0
+                && _headerCount[0] is Label countLabel
+                && !countLabel.text.EndsWith("(working…)"))
+            {
+                countLabel.text = countLabel.text + "  (working…)";
+            }
         }
     }
 }
