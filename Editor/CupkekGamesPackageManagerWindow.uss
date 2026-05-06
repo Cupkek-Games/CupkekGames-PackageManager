@@ -18,7 +18,6 @@
     font-size: 11px;
     color: var(--editor-text-muted);
     white-space: normal;
-    line-height: 1.3;
 }
 
 /* ── Content ── */
