@@ -15,11 +15,12 @@ namespace CupkekGames.PackageManager.Editor
 
         private VisualElement _headerCount;
         private Button _installGameFullButton;
+        private Button _updateAllButton;
         private Button _refreshButton;
         private VisualElement _rowsContainer;
         private Label _errorLabel;
 
-        private Dictionary<string, string> _installedPackages;
+        private Dictionary<string, CupkekGamesPackageInstaller.PackageVersionInfo> _installedPackages;
         private readonly List<Button> _rowInstallButtons = new();
 
         [MenuItem("Tools/CupkekGames/Package Manager", false, 4)]
@@ -120,6 +121,16 @@ namespace CupkekGames.PackageManager.Editor
             _refreshButton.AddToClassList("pm-toolbar-btn");
             toolbar.Add(_refreshButton);
 
+            _updateAllButton = new Button(OnUpdateAll);
+            _updateAllButton.AddToClassList("pm-toolbar-btn");
+            _updateAllButton.AddToClassList("pm-toolbar-btn--update");
+            _updateAllButton.text = "No updates";
+            _updateAllButton.SetEnabled(false);
+            // Hidden by default — only relevant after a Refresh has populated
+            // latest-version info. Refresh online → Show; on offline data, hide.
+            _updateAllButton.style.display = DisplayStyle.None;
+            toolbar.Add(_updateAllButton);
+
             _installGameFullButton = new Button(OnInstallGameFullPackages);
             _installGameFullButton.AddToClassList("pm-toolbar-btn");
             _installGameFullButton.AddToClassList("pm-toolbar-btn--primary");
@@ -145,10 +156,14 @@ namespace CupkekGames.PackageManager.Editor
 
             _rowsContainer.Clear();
             _rowInstallButtons.Clear();
-            Label loading = new Label("Detecting installed packages…");
+            Label loading = new Label("Checking installed packages and registry for updates…");
             loading.AddToClassList("pm-loading-text");
             _rowsContainer.Add(loading);
 
+            // Refresh runs the online list (offlineMode: false) so we get
+            // latest-compatible versions for update detection. Costs ~0.5–2s
+            // network on the first call after editor start; subsequent calls
+            // hit Unity's package-manager cache and are near-instant.
             CupkekGamesPackageInstaller.GetInstalledPackages(installed =>
             {
                 _installedPackages = installed;
@@ -165,7 +180,7 @@ namespace CupkekGames.PackageManager.Editor
                 // resolving), preserve the busy UI so buttons don't flash live.
                 if (CupkekGamesPackageInstaller.IsAddInFlight)
                     EnterBusyState(null, "Installing…");
-            });
+            }, checkLatestVersions: true);
         }
 
         private void BuildRows()
@@ -253,11 +268,25 @@ namespace CupkekGames.PackageManager.Editor
             spacer.style.flexGrow = 1f;
             row.Add(spacer);
 
-            if (isInstalled && _installedPackages.TryGetValue(entry.PackageId, out string version))
+            if (isInstalled && _installedPackages.TryGetValue(entry.PackageId, out var info))
             {
-                Label v = new Label("v" + version);
+                Label v = new Label("v" + info.Installed);
                 v.AddToClassList("pm-row-version");
                 row.Add(v);
+
+                // Update button — only when registry advertised a newer version.
+                if (info.IsOutdated)
+                {
+                    string installId = entry.PackageId;
+                    Button update = null;
+                    update = new Button(() => OnInstallSingle(installId, update));
+                    update.text = "Update v" + info.Latest;
+                    update.AddToClassList("pm-row-install-btn");
+                    update.AddToClassList("pm-row-install-btn--update");
+                    update.tooltip = $"{installId} — installed {info.Installed}, registry has {info.Latest}";
+                    row.Add(update);
+                    _rowInstallButtons.Add(update);
+                }
             }
             else
             {
@@ -281,11 +310,19 @@ namespace CupkekGames.PackageManager.Editor
             int installed = entries.Count(e =>
                 _installedPackages != null && _installedPackages.ContainsKey(e.PackageId));
             int missing = total - installed;
+            int outdated = entries.Count(e =>
+                _installedPackages != null
+                && _installedPackages.TryGetValue(e.PackageId, out var info)
+                && info.IsOutdated);
 
             _headerCount.Clear();
-            Label countLabel = new Label($"{installed}/{total} installed");
+            string countText = $"{installed}/{total} installed";
+            if (outdated > 0) countText += $"  ·  {outdated} outdated";
+            Label countLabel = new Label(countText);
             countLabel.AddToClassList("pm-toolbar-count-text");
-            countLabel.AddToClassList(missing == 0 ? "pm-toolbar-count-text--ok" : "pm-toolbar-count-text--missing");
+            countLabel.AddToClassList(missing == 0 && outdated == 0
+                ? "pm-toolbar-count-text--ok"
+                : "pm-toolbar-count-text--missing");
             _headerCount.Add(countLabel);
 
             if (missing > 0)
@@ -297,6 +334,32 @@ namespace CupkekGames.PackageManager.Editor
             {
                 _installGameFullButton.text = "GameFull Packages Installed";
                 _installGameFullButton.SetEnabled(false);
+            }
+
+            // Update All — visible when latest-version data exists. Enabled
+            // and labelled with the count when any GameFull package is outdated.
+            if (_updateAllButton != null)
+            {
+                bool haveLatestData = _installedPackages != null
+                    && _installedPackages.Values.Any(v => !string.IsNullOrEmpty(v.Latest));
+                if (haveLatestData)
+                {
+                    _updateAllButton.style.display = DisplayStyle.Flex;
+                    if (outdated > 0)
+                    {
+                        _updateAllButton.text = $"Update All ({outdated})";
+                        _updateAllButton.SetEnabled(true);
+                    }
+                    else
+                    {
+                        _updateAllButton.text = "Up to date";
+                        _updateAllButton.SetEnabled(false);
+                    }
+                }
+                else
+                {
+                    _updateAllButton.style.display = DisplayStyle.None;
+                }
             }
         }
 
@@ -322,10 +385,10 @@ namespace CupkekGames.PackageManager.Editor
             // resolved version) and fall back to the asmdef-name probe so
             // Asset-Store-only assets like Animancer are also picked up.
             bool installed = false;
-            string installedVersion = null;
+            CupkekGamesPackageInstaller.PackageVersionInfo info = default;
             if (!string.IsNullOrEmpty(dep.PackageId)
                 && _installedPackages != null
-                && _installedPackages.TryGetValue(dep.PackageId, out installedVersion))
+                && _installedPackages.TryGetValue(dep.PackageId, out info))
             {
                 installed = true;
             }
@@ -372,9 +435,25 @@ namespace CupkekGames.PackageManager.Editor
 
             if (installed)
             {
-                Label v = new Label(string.IsNullOrEmpty(installedVersion) ? "Installed" : "v" + installedVersion);
+                Label v = new Label(string.IsNullOrEmpty(info.Installed) ? "Installed" : "v" + info.Installed);
                 v.AddToClassList("pm-row-version");
                 row.Add(v);
+
+                // Update button — only when this dep is UPM-tracked AND the
+                // registry advertised a newer version. Asset-Store deps fall
+                // through to the asmdef-only branch above and never set Latest.
+                if (info.IsOutdated && !string.IsNullOrEmpty(dep.PackageId))
+                {
+                    string upgradeId = dep.PackageId;
+                    Button update = null;
+                    update = new Button(() => OnInstallSingle(upgradeId, update));
+                    update.text = "Update v" + info.Latest;
+                    update.AddToClassList("pm-row-install-btn");
+                    update.AddToClassList("pm-row-install-btn--update");
+                    update.tooltip = $"{upgradeId} — installed {info.Installed}, registry has {info.Latest}";
+                    row.Add(update);
+                    _rowInstallButtons.Add(update);
+                }
             }
             else
             {
@@ -436,6 +515,31 @@ namespace CupkekGames.PackageManager.Editor
             });
         }
 
+        private void OnUpdateAll()
+        {
+            CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull);
+            List<string> ids = entries
+                .Where(e => _installedPackages != null
+                    && _installedPackages.TryGetValue(e.PackageId, out var info)
+                    && info.IsOutdated)
+                .Select(e => e.PackageId)
+                .ToList();
+            if (ids.Count == 0) return;
+
+            EnterBusyState(_updateAllButton, $"Updating {ids.Count} package(s)…");
+            CupkekGamesPackageInstaller.InstallByPackageIds(ids, (ok, msg) =>
+            {
+                if (!ok)
+                {
+                    Debug.LogError($"[CupkekGames] Bulk update failed: {msg}");
+                }
+                Refresh();
+            });
+            // Reuses InstallByPackageIds — Client.AddAndRemove with the same
+            // id list resolves to "upgrade these to latest" because UPM picks
+            // the highest compatible version when no explicit version is pinned.
+        }
+
         private void OnInstallGameFullPackages()
         {
             CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull);
@@ -477,6 +581,13 @@ namespace CupkekGames.PackageManager.Editor
                 _installGameFullButton.SetEnabled(false);
                 if (activeButton == _installGameFullButton)
                     _installGameFullButton.text = busyText;
+            }
+
+            if (_updateAllButton != null)
+            {
+                _updateAllButton.SetEnabled(false);
+                if (activeButton == _updateAllButton)
+                    _updateAllButton.text = busyText;
             }
 
             if (_refreshButton != null)

@@ -21,10 +21,34 @@ namespace CupkekGames.PackageManager.Editor
         private const string RegistryUrl = "https://www.docs.cupkek.games/upm";
         private const string RegistryScope = "com.cupkekgames";
 
+        /// <summary>
+        /// Per-package version status returned by <see cref="GetInstalledPackages"/>.
+        /// <see cref="Installed"/> is the version currently resolved in the project;
+        /// <see cref="Latest"/> is the highest compatible version the registry advertises
+        /// (empty when the list call ran in offline mode or the registry didn't return one).
+        /// </summary>
+        public readonly struct PackageVersionInfo
+        {
+            public readonly string Installed;
+            public readonly string Latest;
+
+            public PackageVersionInfo(string installed, string latest)
+            {
+                Installed = installed;
+                Latest = latest;
+            }
+
+            /// <summary>True when an update is available (installed != latest, both populated).</summary>
+            public bool IsOutdated =>
+                !string.IsNullOrEmpty(Installed) &&
+                !string.IsNullOrEmpty(Latest) &&
+                Installed != Latest;
+        }
+
         private static ListRequest _listRequest;
         private static AddRequest _addRequest;
         private static AddAndRemoveRequest _addAndRemoveRequest;
-        private static Action<Dictionary<string, string>> _listCallback;
+        private static Action<Dictionary<string, PackageVersionInfo>> _listCallback;
         private static Action<bool, string> _addCallback;
         private static Action<bool, string> _addAndRemoveCallback;
 
@@ -41,10 +65,18 @@ namespace CupkekGames.PackageManager.Editor
             }
         }
 
-        public static void GetInstalledPackages(Action<Dictionary<string, string>> onCompleted)
+        /// <summary>
+        /// List installed packages, optionally querying the registry for the latest
+        /// compatible version of each. Online mode populates <see cref="PackageVersionInfo.Latest"/>
+        /// and lets the caller detect outdated packages; offline mode returns immediately
+        /// with <c>Latest</c> empty.
+        /// </summary>
+        public static void GetInstalledPackages(
+            Action<Dictionary<string, PackageVersionInfo>> onCompleted,
+            bool checkLatestVersions = false)
         {
             if (_listRequest != null) return;
-            _listRequest = Client.List(offlineMode: true, includeIndirectDependencies: false);
+            _listRequest = Client.List(offlineMode: !checkLatestVersions, includeIndirectDependencies: false);
             _listCallback = onCompleted;
             EditorApplication.update += PumpListRequest;
         }
@@ -54,16 +86,21 @@ namespace CupkekGames.PackageManager.Editor
             if (_listRequest == null || !_listRequest.IsCompleted) return;
             EditorApplication.update -= PumpListRequest;
 
-            var dict = new Dictionary<string, string>();
+            var dict = new Dictionary<string, PackageVersionInfo>();
             if (_listRequest.Status == StatusCode.Success)
             {
                 foreach (var pkg in _listRequest.Result)
                 {
-                    dict[pkg.name] = pkg.version;
+                    // versions.latestCompatible is populated only when the list call
+                    // ran in online mode (offlineMode: false). It can also be empty
+                    // when the registry didn't advertise an upgrade path; we map
+                    // either case to a null Latest so IsOutdated short-circuits.
+                    string latest = pkg.versions != null ? pkg.versions.latestCompatible : null;
+                    dict[pkg.name] = new PackageVersionInfo(pkg.version, latest);
                 }
             }
 
-            Action<Dictionary<string, string>> cb = _listCallback;
+            Action<Dictionary<string, PackageVersionInfo>> cb = _listCallback;
             _listRequest = null;
             _listCallback = null;
             cb?.Invoke(dict);

@@ -108,6 +108,16 @@
     background-color: var(--editor-brand-bg);
 }
 
+/* Update All — distinct from "primary" so it reads as "newer thing
+ * available" rather than "default action". Amber-ish to differentiate
+ * from the green-leaning primary install button. */
+.pm-toolbar-btn--update {
+    -unity-font-style: bold;
+    border-color: rgba(220, 160, 50, 0.65);
+    background-color: rgba(120, 80, 20, 0.55);
+    color: rgb(255, 220, 160);
+}
+
 .pm-toolbar-btn:disabled {
     opacity: 0.5;
 }
@@ -215,6 +225,16 @@
     border-color: var(--editor-brand-border);
     background-color: var(--editor-brand-bg);
     color: var(--editor-text-secondary);
+}
+
+/* Per-row Update button — slightly wider to fit "Update v0.2.4" labels
+ * comfortably, amber-tinted so it visually pairs with the toolbar
+ * Update All button. */
+.pm-row-install-btn--update {
+    min-width: 110px;
+    border-color: rgba(220, 160, 50, 0.65);
+    background-color: rgba(120, 80, 20, 0.55);
+    color: rgb(255, 220, 160);
 }
 
 /* ── Misc ── */
