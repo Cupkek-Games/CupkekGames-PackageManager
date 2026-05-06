@@ -3,6 +3,7 @@ using CupkekGames.EditorUI;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Compilation;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -172,10 +173,40 @@ namespace CupkekGames.PackageManager.Editor
             _rowsContainer.Clear();
             _rowInstallButtons.Clear();
 
+            // Section 1: CupkekGames sibling packages (the GameFull bundle).
+            VisualElement cupkekHeader = new VisualElement();
+            cupkekHeader.AddToClassList("pm-section-header");
+            Label cupkekHeaderText = new Label("CupkekGames Packages");
+            cupkekHeaderText.AddToClassList("pm-section-header-text");
+            cupkekHeader.Add(cupkekHeaderText);
+            _rowsContainer.Add(cupkekHeader);
+
             CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull);
             foreach (CupkekGamesPackageRegistry.Entry entry in entries)
             {
                 _rowsContainer.Add(BuildRow(entry));
+            }
+
+            // Section 2: Optional third-party deps that unlock features in
+            // sibling packages. Cinemachine + UniTask auto-install via UPM /
+            // git URL; Animancer / DamageNumbersPro / PrimeTween / Ink need
+            // an Asset Store visit.
+            VisualElement extHeader = new VisualElement();
+            extHeader.AddToClassList("pm-section-header");
+            Label extHeaderText = new Label("External Dependencies (optional)");
+            extHeaderText.AddToClassList("pm-section-header-text");
+            extHeader.Add(extHeaderText);
+            Label extHeaderSub = new Label(
+                "Unlock extra features in sibling packages. Auto-installs the UPM/git deps; " +
+                "Asset Store assets open in your browser.");
+            extHeaderSub.AddToClassList("pm-section-header-sub");
+            extHeader.Add(extHeaderSub);
+            _rowsContainer.Add(extHeader);
+
+            HashSet<string> presentAsmdefs = GetCompiledAsmdefNames();
+            foreach (CupkekGamesExternalDependency dep in CupkekGamesExternalDependencyRegistry.All)
+            {
+                _rowsContainer.Add(BuildExternalRow(dep, presentAsmdefs));
             }
         }
 
@@ -279,6 +310,117 @@ namespace CupkekGames.PackageManager.Editor
             }
             _errorLabel.text = "Last install error: " + lastError;
             _errorLabel.style.display = DisplayStyle.Flex;
+        }
+
+        // ─────────────────────────────────────────
+        //  External-dep row + install
+        // ─────────────────────────────────────────
+
+        private VisualElement BuildExternalRow(CupkekGamesExternalDependency dep, HashSet<string> presentAsmdefs)
+        {
+            // Detect installed-or-not. Prefer the UPM list (it knows the
+            // resolved version) and fall back to the asmdef-name probe so
+            // Asset-Store-only assets like Animancer are also picked up.
+            bool installed = false;
+            string installedVersion = null;
+            if (!string.IsNullOrEmpty(dep.PackageId)
+                && _installedPackages != null
+                && _installedPackages.TryGetValue(dep.PackageId, out installedVersion))
+            {
+                installed = true;
+            }
+            else if (!string.IsNullOrEmpty(dep.AsmdefName) && presentAsmdefs.Contains(dep.AsmdefName))
+            {
+                installed = true;
+            }
+
+            VisualElement row = new VisualElement();
+            row.AddToClassList("pm-row");
+            row.AddToClassList(installed ? "pm-row--installed" : "pm-row--missing");
+
+            VisualElement icon = new VisualElement();
+            icon.AddToClassList("pm-row-icon");
+            icon.AddToClassList(installed ? "pm-row-icon--installed" : "pm-row-icon--missing");
+            row.Add(icon);
+
+            Label displayName = new Label(dep.DisplayName);
+            displayName.AddToClassList("pm-row-displayname");
+            row.Add(displayName);
+
+            // "used by" hint in the secondary id slot
+            if (!string.IsNullOrEmpty(dep.UsedBy))
+            {
+                Label usedBy = new Label("used by " + dep.UsedBy);
+                usedBy.AddToClassList("pm-row-packageid");
+                row.Add(usedBy);
+            }
+
+            // Tag chip — Asset Store paid marker, otherwise nothing
+            if (dep.IsPaid)
+            {
+                VisualElement tagContainer = new VisualElement();
+                tagContainer.AddToClassList("pm-row-tags");
+                Label paidTag = new Label("Asset Store ($)");
+                paidTag.AddToClassList("pm-row-tag");
+                tagContainer.Add(paidTag);
+                row.Add(tagContainer);
+            }
+
+            VisualElement spacer = new VisualElement();
+            spacer.style.flexGrow = 1f;
+            row.Add(spacer);
+
+            if (installed)
+            {
+                Label v = new Label(string.IsNullOrEmpty(installedVersion) ? "Installed" : "v" + installedVersion);
+                v.AddToClassList("pm-row-version");
+                row.Add(v);
+            }
+            else
+            {
+                // Show whichever action(s) make sense:
+                //   - Auto-install via UPM/git when PackageId is set
+                //   - Asset Store deep-link when AssetStoreUrl is set
+                // Some deps offer both (Ink); paid assets only have the link.
+                if (!string.IsNullOrEmpty(dep.PackageId))
+                {
+                    string installId = dep.PackageId;
+                    Button install = null;
+                    install = new Button(() => OnInstallSingle(installId, install));
+                    install.text = "Install";
+                    install.tooltip = installId;
+                    install.AddToClassList("pm-row-install-btn");
+                    row.Add(install);
+                    _rowInstallButtons.Add(install);
+                }
+
+                if (!string.IsNullOrEmpty(dep.AssetStoreUrl))
+                {
+                    string url = dep.AssetStoreUrl;
+                    Button asUrl = new Button(() => Application.OpenURL(url));
+                    asUrl.text = "Asset Store";
+                    asUrl.tooltip = url;
+                    asUrl.AddToClassList("pm-row-install-btn");
+                    row.Add(asUrl);
+                }
+            }
+
+            return row;
+        }
+
+        /// <summary>
+        /// Snapshot of asmdef assembly names currently compiled for the Player.
+        /// Used to detect Asset-Store-only deps (Animancer, DamageNumbersPro,
+        /// PrimeTween) that don't appear in the UPM package list.
+        /// </summary>
+        private static HashSet<string> GetCompiledAsmdefNames()
+        {
+            HashSet<string> set = new HashSet<string>();
+            foreach (Assembly a in CompilationPipeline.GetAssemblies(AssembliesType.Player))
+            {
+                set.Add(a.name);
+            }
+            return set;
         }
 
         private void OnInstallSingle(string packageId, Button activeButton)

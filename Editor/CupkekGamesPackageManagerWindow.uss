@@ -20,6 +20,33 @@
     white-space: normal;
 }
 
+/* ── Section header ──
+ * Splits the rows scroll into "CupkekGames Packages" and the
+ * "External Dependencies (optional)" trailing section. */
+
+.pm-section-header {
+    margin: 6px 0 4px 2px;
+}
+
+.pm-section-header-text {
+    font-size: 12px;
+    -unity-font-style: bold;
+    color: var(--editor-text-primary);
+}
+
+.pm-section-header-sub {
+    font-size: 11px;
+    color: var(--editor-text-muted);
+    white-space: normal;
+    margin-top: 2px;
+}
+
+/* The first section header sits at the top of the rows scroll — it has
+ * no preceding content, so trim its top margin to keep alignment. */
+.pm-rows-scroll > .pm-section-header:first-child {
+    margin-top: 0;
+}
+
 /* ── Content ── */
 
 .pm-content {
