@@ -6,8 +6,22 @@ namespace CupkekGames.PackageManager.Editor
     /// <summary>Tag constants used by <see cref="CupkekGamesPackageRegistry.Entry.Tags"/>.</summary>
     public static class PackageTags
     {
-        /// <summary>Required by the Luna GameFull sample.</summary>
+        /// <summary>
+        /// Required by the Luna GameFull sample. Lean set — only the cupkek packages
+        /// the sample actually uses (foundation primitives + data layer + inventory +
+        /// settings + scene transitions). Pure Luna-style: no third-party Asset Store
+        /// or external deps required to compile.
+        /// </summary>
         public const string GameFull = "GameFull";
+
+        /// <summary>
+        /// Every CupkekGames sibling package. Used by the "Install All" bulk button
+        /// for HeroManager-style projects that want the entire stack. Most of these
+        /// require Asset Store / git deps (PrimeTween, UniTask, Animancer, etc.) —
+        /// the user is expected to install those separately via the External
+        /// Dependencies section.
+        /// </summary>
+        public const string All = "All";
     }
 
     public static class CupkekGamesPackageRegistry
@@ -38,59 +52,82 @@ namespace CupkekGames.PackageManager.Editor
         // https://www.docs.cupkek.games/upm. Tarballs in each repo's GitHub
         // Releases. See Documentation/CREATING_A_PACKAGE.md for the release flow.
         // Order matters: leaf deps first, packages that depend on them after.
+        //
+        // Tag policy:
+        //   - GameFull: ONLY packages the Luna GameFull sample actually uses.
+        //               Lean set (~20) — installs cleanly with no third-party deps.
+        //   - All:      every cupkek package. Most of the heavier domain packages
+        //               (combat, character, vfx, etc.) need third-party deps;
+        //               consumers using "Install All" must install those manually
+        //               via the External Dependencies section.
         public static readonly Entry[] Entries = new[]
         {
-            new Entry("com.cupkekgames.singletons",       "Singleton",       PackageTags.GameFull),
-            new Entry("com.cupkekgames.pool",            "Pool",            PackageTags.GameFull),
-            new Entry("com.cupkekgames.fadeables",        "Fadeable",        PackageTags.GameFull),
-            new Entry("com.cupkekgames.keyvaluedatabases","KeyValueDatabase",PackageTags.GameFull),
-            new Entry("com.cupkekgames.prefabloaders",    "PrefabLoader",    PackageTags.GameFull),
-            new Entry("com.cupkekgames.assetfinder",     "AssetFinder",     PackageTags.GameFull),
-            new Entry("com.cupkekgames.transforms",      "Transforms",      PackageTags.GameFull),
-            new Entry("com.cupkekgames.editorui",        "EditorUI",        PackageTags.GameFull),
-            new Entry("com.cupkekgames.editorinspector", "EditorInspector", PackageTags.GameFull),
-            new Entry("com.cupkekgames.services",  "ServiceLocator",  PackageTags.GameFull),
-            new Entry("com.cupkekgames.data",            "Data",            PackageTags.GameFull),
-            new Entry("com.cupkekgames.gamesave",        "GameSave",        PackageTags.GameFull),
-            new Entry("com.cupkekgames.newtonsoft",      "Newtonsoft",      PackageTags.GameFull),
-            new Entry("com.cupkekgames.rpgstats",        "RPGStats",        PackageTags.GameFull),
-            new Entry("com.cupkekgames.inventory",       "Inventory",       PackageTags.GameFull),
-            new Entry("com.cupkekgames.addressableassets",    "Addressables",    PackageTags.GameFull),
-            new Entry("com.cupkekgames.scenemanagement", "SceneManagement", PackageTags.GameFull),
-            new Entry("com.cupkekgames.sequencer",       "Sequencer",       PackageTags.GameFull),
-            new Entry("com.cupkekgames.settings",        "Settings",        PackageTags.GameFull),
-            new Entry("com.cupkekgames.inkbridge",             "Ink",             PackageTags.GameFull),
+            // ── Foundation (needed by GameFull) ──
+            new Entry("com.cupkekgames.singletons",         "Singleton",         PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.pool",               "Pool",              PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.fadeables",          "Fadeable",          PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.keyvaluedatabases",  "KeyValueDatabase",  PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.prefabloaders",      "PrefabLoader",      PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.assetfinder",        "AssetFinder",       PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.transforms",         "Transforms",        PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.editorui",           "EditorUI",          PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.editorinspector",    "EditorInspector",   PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.input",              "Input",             PackageTags.GameFull, PackageTags.All),
+
+            // ── Data layer (needed by GameFull) ──
+            new Entry("com.cupkekgames.services",           "ServiceLocator",    PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.data",               "Data",              PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.gamesave",           "GameSave",          PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.newtonsoft",         "Newtonsoft",        PackageTags.GameFull, PackageTags.All),
+
+            // ── Inventory + RPG Stats (needed by GameFull) ──
+            new Entry("com.cupkekgames.rpgstats",           "RPGStats",          PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.inventory",          "Inventory",         PackageTags.GameFull, PackageTags.All),
+
+            // ── Scene + sequence + settings (needed by GameFull) ──
+            new Entry("com.cupkekgames.addressableassets",  "Addressables",      PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.scenemanagement",    "SceneManagement",   PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.sequencer",          "Sequencer",         PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.settings",           "Settings",          PackageTags.GameFull, PackageTags.All),
+
+            // ── All-only packages (require third-party deps; not part of GameFull sample) ──
+
             // Phase A — extracted from HM Plugins/CupkekGames/, 2026-04-30
-            new Entry("com.cupkekgames.diagnostics",     "Diagnostics",     PackageTags.GameFull),
-            new Entry("com.cupkekgames.textpopup",       "TextPopup",       PackageTags.GameFull),
-            new Entry("com.cupkekgames.audio",           "Audio",           PackageTags.GameFull),
-            new Entry("com.cupkekgames.animations",      "Animations",      PackageTags.GameFull),
-            new Entry("com.cupkekgames.navigation",      "Navigation",      PackageTags.GameFull),
-            new Entry("com.cupkekgames.quests",          "Quests",          PackageTags.GameFull),
-            new Entry("com.cupkekgames.editortools",     "EditorTools",     PackageTags.GameFull),
+            new Entry("com.cupkekgames.diagnostics",        "Diagnostics",       PackageTags.All),
+            new Entry("com.cupkekgames.textpopup",          "TextPopup",         PackageTags.All),
+            new Entry("com.cupkekgames.audio",              "Audio",             PackageTags.All),
+            new Entry("com.cupkekgames.animations",         "Animations",        PackageTags.All),
+            new Entry("com.cupkekgames.navigation",         "Navigation",        PackageTags.All),
+            new Entry("com.cupkekgames.quests",             "Quests",            PackageTags.All),
+            new Entry("com.cupkekgames.editortools",        "EditorTools",       PackageTags.All),
+
             // Phase D — TimeSystem extraction
-            new Entry("com.cupkekgames.timesystem",      "TimeSystem",      PackageTags.GameFull),
+            new Entry("com.cupkekgames.timesystem",         "TimeSystem",        PackageTags.All),
+
+            // Phase D — BehaviourTrees + StateMachines
+            new Entry("com.cupkekgames.behaviourtrees",     "BehaviourTrees",    PackageTags.All),
+            new Entry("com.cupkekgames.statemachines",      "StateMachines",     PackageTags.All),
+
+            // Phase J — final HM framework extraction batch, 2026-05-02
+            new Entry("com.cupkekgames.cameras",            "Cameras",           PackageTags.All),
+            new Entry("com.cupkekgames.character",          "Character",         PackageTags.All),
+            new Entry("com.cupkekgames.units",              "Units",             PackageTags.All),
+            new Entry("com.cupkekgames.shapes",             "Shapes",            PackageTags.All),
+            new Entry("com.cupkekgames.shapedrawing",       "ShapeDrawing",      PackageTags.All),
+            new Entry("com.cupkekgames.shapedrawing.shapes","ShapeDrawing.Shapes", PackageTags.All),
+            new Entry("com.cupkekgames.vfx",                "VFX",               PackageTags.All),
+            new Entry("com.cupkekgames.vfx.mktoon",         "VFX.MKToon",        PackageTags.All),
+            new Entry("com.cupkekgames.vfx.potatoon",       "VFX.PotaToon",      PackageTags.All),
+            new Entry("com.cupkekgames.combat",             "Combat",            PackageTags.All),
+            new Entry("com.cupkekgames.inventorysystem.crafting","InventorySystem.Crafting", PackageTags.All),
+            new Entry("com.cupkekgames.inventorysystem.farming", "InventorySystem.Farming",  PackageTags.All),
+            new Entry("com.cupkekgames.localization",       "Localization",      PackageTags.All),
+
             // Phase C — Tier 2 bridges (third-party plugin adapters)
-            new Entry("com.cupkekgames.textpopup.damagenumberspro", "TextPopup.DamageNumbersPro", PackageTags.GameFull),
-            new Entry("com.cupkekgames.audio.sonity",              "Audio.Sonity",              PackageTags.GameFull),
-            new Entry("com.cupkekgames.animations.animancer",      "Animations.Animancer",      PackageTags.GameFull),
-            // Phase D — BehaviourTrees + StateMachines (pluralized to fix namespace=class collision)
-            new Entry("com.cupkekgames.behaviourtrees",            "BehaviourTrees",            PackageTags.GameFull),
-            new Entry("com.cupkekgames.statemachines",             "StateMachines",             PackageTags.GameFull),
-            // Phase J — final HM framework extraction batch, 2026-05-02 (13 packages)
-            new Entry("com.cupkekgames.cameras",                   "Cameras",                   PackageTags.GameFull),
-            new Entry("com.cupkekgames.character",                 "Character",                 PackageTags.GameFull),
-            new Entry("com.cupkekgames.units",                     "Units",                     PackageTags.GameFull),
-            new Entry("com.cupkekgames.shapes",                    "Shapes",                    PackageTags.GameFull),
-            new Entry("com.cupkekgames.shapedrawing",              "ShapeDrawing",              PackageTags.GameFull),
-            new Entry("com.cupkekgames.shapedrawing.shapes",       "ShapeDrawing.Shapes",       PackageTags.GameFull),
-            new Entry("com.cupkekgames.vfx",                       "VFX",                       PackageTags.GameFull),
-            new Entry("com.cupkekgames.vfx.mktoon",                "VFX.MKToon",                PackageTags.GameFull),
-            new Entry("com.cupkekgames.vfx.potatoon",              "VFX.PotaToon",              PackageTags.GameFull),
-            new Entry("com.cupkekgames.combat",                    "Combat",                    PackageTags.GameFull),
-            new Entry("com.cupkekgames.inventorysystem.crafting",  "InventorySystem.Crafting",  PackageTags.GameFull),
-            new Entry("com.cupkekgames.inventorysystem.farming",   "InventorySystem.Farming",   PackageTags.GameFull),
-            new Entry("com.cupkekgames.localization",              "Localization",              PackageTags.GameFull),
+            new Entry("com.cupkekgames.inkbridge",          "Ink",               PackageTags.All),
+            new Entry("com.cupkekgames.textpopup.damagenumberspro", "TextPopup.DamageNumbersPro", PackageTags.All),
+            new Entry("com.cupkekgames.audio.sonity",       "Audio.Sonity",      PackageTags.All),
+            new Entry("com.cupkekgames.animations.animancer","Animations.Animancer", PackageTags.All),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>

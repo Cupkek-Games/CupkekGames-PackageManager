@@ -15,6 +15,7 @@ namespace CupkekGames.PackageManager.Editor
 
         private VisualElement _headerCount;
         private Button _installGameFullButton;
+        private Button _installAllButton;
         private Button _updateAllButton;
         private Button _refreshButton;
         private VisualElement _rowsContainer;
@@ -91,8 +92,10 @@ namespace CupkekGames.PackageManager.Editor
 
             Label subtitle = new Label(
                 "Sibling CupkekGames packages installed via the CupkekGames UPM scoped registry " +
-                "(www.docs.cupkek.games/upm). Required for the Luna GameFull sample. " +
-                "Installing here writes the registry block to your Packages/manifest.json automatically.");
+                "(www.docs.cupkek.games/upm). Use \"Install GameFull Packages\" for the Luna " +
+                "GameFull sample's lean cupkek-only set, or \"Install All\" for every CupkekGames " +
+                "package. Installing here writes the registry block to your Packages/manifest.json " +
+                "automatically.");
             subtitle.AddToClassList("pm-header-subtitle");
             header.Add(subtitle);
         }
@@ -135,6 +138,16 @@ namespace CupkekGames.PackageManager.Editor
             _installGameFullButton.AddToClassList("pm-toolbar-btn");
             _installGameFullButton.AddToClassList("pm-toolbar-btn--primary");
             toolbar.Add(_installGameFullButton);
+
+            _installAllButton = new Button(OnInstallAllPackages);
+            _installAllButton.AddToClassList("pm-toolbar-btn");
+            _installAllButton.text = "Install All";
+            _installAllButton.tooltip =
+                "Install every CupkekGames sibling package. Most domain packages " +
+                "(combat, character, vfx, navigation, …) require Asset Store / git " +
+                "third-party deps; you'll need to install those manually after " +
+                "via the External Dependencies section.";
+            toolbar.Add(_installAllButton);
 
             // Scrollable rows
             ScrollView scroll = new ScrollView(ScrollViewMode.Vertical);
@@ -188,32 +201,71 @@ namespace CupkekGames.PackageManager.Editor
             _rowsContainer.Clear();
             _rowInstallButtons.Clear();
 
-            // Section 1: CupkekGames sibling packages (the GameFull bundle).
-            VisualElement cupkekHeader = new VisualElement();
-            cupkekHeader.AddToClassList("pm-section-header");
-            Label cupkekHeaderText = new Label("CupkekGames Packages");
-            cupkekHeaderText.AddToClassList("pm-section-header-text");
-            cupkekHeader.Add(cupkekHeaderText);
-            _rowsContainer.Add(cupkekHeader);
+            // Section 1: GameFull packages — the lean cupkek set the Luna GameFull
+            // sample uses (foundation primitives + data layer + inventory + scene
+            // transitions + settings). No third-party deps required to compile.
+            VisualElement gfHeader = new VisualElement();
+            gfHeader.AddToClassList("pm-section-header");
+            Label gfHeaderText = new Label("GameFull Packages");
+            gfHeaderText.AddToClassList("pm-section-header-text");
+            gfHeader.Add(gfHeaderText);
+            Label gfHeaderSub = new Label(
+                "What the Luna GameFull sample needs. Pure CupkekGames packages — " +
+                "no Asset Store / external deps required.");
+            gfHeaderSub.AddToClassList("pm-section-header-sub");
+            gfHeader.Add(gfHeaderSub);
+            _rowsContainer.Add(gfHeader);
 
-            CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull);
-            foreach (CupkekGamesPackageRegistry.Entry entry in entries)
+            HashSet<string> renderedIds = new HashSet<string>();
+            foreach (CupkekGamesPackageRegistry.Entry entry in
+                CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull))
             {
                 _rowsContainer.Add(BuildRow(entry));
+                renderedIds.Add(entry.PackageId);
             }
 
-            // Section 2: Optional third-party deps that unlock features in
-            // sibling packages. Cinemachine + UniTask auto-install via UPM /
-            // git URL; Animancer / DamageNumbersPro / PrimeTween / Ink need
-            // an Asset Store visit.
+            // Section 2: Other CupkekGames packages — domain packages that
+            // generally require third-party Asset Store / git deps (combat,
+            // character, vfx, navigation, …). Shown so users can install them
+            // individually or via the toolbar's "Install All" button.
+            CupkekGamesPackageRegistry.Entry[] otherEntries =
+                CupkekGamesPackageRegistry.Entries
+                    .Where(e => !renderedIds.Contains(e.PackageId))
+                    .ToArray();
+            if (otherEntries.Length > 0)
+            {
+                VisualElement otherHeader = new VisualElement();
+                otherHeader.AddToClassList("pm-section-header");
+                Label otherHeaderText = new Label("Other CupkekGames Packages");
+                otherHeaderText.AddToClassList("pm-section-header-text");
+                otherHeader.Add(otherHeaderText);
+                Label otherHeaderSub = new Label(
+                    "Domain packages — most require third-party deps " +
+                    "(see External Dependencies below). Install individually " +
+                    "or use the toolbar's \"Install All\" button.");
+                otherHeaderSub.AddToClassList("pm-section-header-sub");
+                otherHeader.Add(otherHeaderSub);
+                _rowsContainer.Add(otherHeader);
+
+                foreach (CupkekGamesPackageRegistry.Entry entry in otherEntries)
+                {
+                    _rowsContainer.Add(BuildRow(entry));
+                }
+            }
+
+            // Section 3: External (third-party) dependencies for specific
+            // packages above. Cinemachine + UniTask auto-install via UPM / git
+            // URL; Animancer / DamageNumbersPro / PrimeTween / Ink open the
+            // Asset Store. Each row's "used by" hint shows which cupkek package
+            // unlocks when the dep is installed.
             VisualElement extHeader = new VisualElement();
             extHeader.AddToClassList("pm-section-header");
-            Label extHeaderText = new Label("External Dependencies (optional)");
+            Label extHeaderText = new Label("External Dependencies (for specific packages)");
             extHeaderText.AddToClassList("pm-section-header-text");
             extHeader.Add(extHeaderText);
             Label extHeaderSub = new Label(
-                "Unlock extra features in sibling packages. Auto-installs the UPM/git deps; " +
-                "Asset Store assets open in your browser.");
+                "Required by some of the \"Other CupkekGames Packages\" above. " +
+                "Not needed for the GameFull sample.");
             extHeaderSub.AddToClassList("pm-section-header-sub");
             extHeader.Add(extHeaderSub);
             _rowsContainer.Add(extHeader);
@@ -310,7 +362,10 @@ namespace CupkekGames.PackageManager.Editor
             int installed = entries.Count(e =>
                 _installedPackages != null && _installedPackages.ContainsKey(e.PackageId));
             int missing = total - installed;
-            int outdated = entries.Count(e =>
+
+            // Count outdated across ALL cupkek packages (not just GameFull) so
+            // Update All catches stuff installed via "Install All" too.
+            int outdated = CupkekGamesPackageRegistry.Entries.Count(e =>
                 _installedPackages != null
                 && _installedPackages.TryGetValue(e.PackageId, out var info)
                 && info.IsOutdated);
@@ -334,6 +389,25 @@ namespace CupkekGames.PackageManager.Editor
             {
                 _installGameFullButton.text = "GameFull Packages Installed";
                 _installGameFullButton.SetEnabled(false);
+            }
+
+            // Install All — total count of cupkek packages still missing.
+            CupkekGamesPackageRegistry.Entry[] allEntries =
+                CupkekGamesPackageRegistry.GetByTag(PackageTags.All);
+            int allMissing = allEntries.Count(e =>
+                _installedPackages == null || !_installedPackages.ContainsKey(e.PackageId));
+            if (_installAllButton != null)
+            {
+                if (allMissing > 0)
+                {
+                    _installAllButton.text = $"Install All ({allMissing})";
+                    _installAllButton.SetEnabled(true);
+                }
+                else
+                {
+                    _installAllButton.text = "All Installed";
+                    _installAllButton.SetEnabled(false);
+                }
             }
 
             // Update All — visible when latest-version data exists. Enabled
@@ -517,8 +591,9 @@ namespace CupkekGames.PackageManager.Editor
 
         private void OnUpdateAll()
         {
-            CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull);
-            List<string> ids = entries
+            // Update across every cupkek package — not just GameFull — so users who
+            // pulled in domain packages via Install All also benefit.
+            List<string> ids = CupkekGamesPackageRegistry.Entries
                 .Where(e => _installedPackages != null
                     && _installedPackages.TryGetValue(e.PackageId, out var info)
                     && info.IsOutdated)
@@ -563,6 +638,47 @@ namespace CupkekGames.PackageManager.Editor
             // atomically via the scoped registry.
         }
 
+        private void OnInstallAllPackages()
+        {
+            CupkekGamesPackageRegistry.Entry[] entries = CupkekGamesPackageRegistry.GetByTag(PackageTags.All);
+            List<string> ids = entries
+                .Where(e => _installedPackages == null || !_installedPackages.ContainsKey(e.PackageId))
+                .Select(e => e.PackageId)
+                .ToList();
+            if (ids.Count == 0) return;
+
+            // Most cupkek domain packages need third-party Asset Store / git deps
+            // (PrimeTween, UniTask, Animancer, DamageNumbersPro, Ink, Cinemachine).
+            // Without those, packages like combat/character/vfx/etc. produce CS0246
+            // until the user installs them. Make the trade-off explicit before
+            // committing to ~45 package installs.
+            bool confirm = EditorUtility.DisplayDialog(
+                "Install All CupkekGames Packages?",
+                $"This installs {ids.Count} CupkekGames package(s).\n\n" +
+                "Most domain packages (combat, character, vfx, animations, " +
+                "audio bridges, etc.) require third-party dependencies like " +
+                "PrimeTween, UniTask, Animancer Pro, DamageNumbersPro, Ink, " +
+                "or Cinemachine.\n\n" +
+                "After install, the External Dependencies section below will " +
+                "show which third-party deps you still need. Some are one-click " +
+                "(Cinemachine, UniTask); others require an Asset Store visit.\n\n" +
+                "Until those third-party deps are installed, the affected " +
+                "CupkekGames packages will produce compile errors. Continue?",
+                "Install",
+                "Cancel");
+            if (!confirm) return;
+
+            EnterBusyState(_installAllButton, $"Installing {ids.Count} package(s)…");
+            CupkekGamesPackageInstaller.InstallByPackageIds(ids, (ok, msg) =>
+            {
+                if (!ok)
+                {
+                    Debug.LogError($"[CupkekGames] Install-all failed: {msg}");
+                }
+                Refresh();
+            });
+        }
+
         // ─────────────────────────────────────────
         //  Busy state
         // ─────────────────────────────────────────
@@ -581,6 +697,13 @@ namespace CupkekGames.PackageManager.Editor
                 _installGameFullButton.SetEnabled(false);
                 if (activeButton == _installGameFullButton)
                     _installGameFullButton.text = busyText;
+            }
+
+            if (_installAllButton != null)
+            {
+                _installAllButton.SetEnabled(false);
+                if (activeButton == _installAllButton)
+                    _installAllButton.text = busyText;
             }
 
             if (_updateAllButton != null)
