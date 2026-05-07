@@ -200,8 +200,36 @@ namespace CupkekGames.PackageManager.Editor
         {
             _rowsContainer.Clear();
             _rowInstallButtons.Clear();
+            HashSet<string> renderedIds = new HashSet<string>();
 
-            // Section 1: GameFull packages — the lean cupkek set the Luna GameFull
+            // Section 1: Luna UI — the headline package. Foundation deps install
+            // transitively via Luna's package.json, so a single Install here
+            // brings in the bundled set (singletons, pool, fadeables, etc.).
+            CupkekGamesPackageRegistry.Entry[] lunaEntries =
+                CupkekGamesPackageRegistry.GetByTag(PackageTags.Luna);
+            if (lunaEntries.Length > 0)
+            {
+                VisualElement lunaHeader = new VisualElement();
+                lunaHeader.AddToClassList("pm-section-header");
+                Label lunaHeaderText = new Label("Luna UI");
+                lunaHeaderText.AddToClassList("pm-section-header-text");
+                lunaHeader.Add(lunaHeaderText);
+                Label lunaHeaderSub = new Label(
+                    "Headline UI Toolkit framework. Bundled foundation deps " +
+                    "(Singletons, Pool, Fadeables, KeyValueDatabases, " +
+                    "PrefabLoaders, Input, …) install transitively.");
+                lunaHeaderSub.AddToClassList("pm-section-header-sub");
+                lunaHeader.Add(lunaHeaderSub);
+                _rowsContainer.Add(lunaHeader);
+
+                foreach (CupkekGamesPackageRegistry.Entry entry in lunaEntries)
+                {
+                    _rowsContainer.Add(BuildRow(entry));
+                    renderedIds.Add(entry.PackageId);
+                }
+            }
+
+            // Section 2: GameFull packages — the lean cupkek set the Luna GameFull
             // sample uses (foundation primitives + data layer + inventory + scene
             // transitions + settings). No third-party deps required to compile.
             VisualElement gfHeader = new VisualElement();
@@ -216,10 +244,10 @@ namespace CupkekGames.PackageManager.Editor
             gfHeader.Add(gfHeaderSub);
             _rowsContainer.Add(gfHeader);
 
-            HashSet<string> renderedIds = new HashSet<string>();
             foreach (CupkekGamesPackageRegistry.Entry entry in
                 CupkekGamesPackageRegistry.GetByTag(PackageTags.GameFull))
             {
+                if (renderedIds.Contains(entry.PackageId)) continue;
                 _rowsContainer.Add(BuildRow(entry));
                 renderedIds.Add(entry.PackageId);
             }

@@ -7,6 +7,14 @@ namespace CupkekGames.PackageManager.Editor
     public static class PackageTags
     {
         /// <summary>
+        /// The Luna UI package itself. Headline UI Toolkit framework — pulls in its
+        /// bundled foundation deps (singletons, pool, fadeables, keyvaluedatabases,
+        /// prefabloaders, input, etc.) transitively via package.json. Shown as its
+        /// own top section in the Package Manager window.
+        /// </summary>
+        public const string Luna = "Luna";
+
+        /// <summary>
         /// Required by the Luna GameFull sample. Lean set — only the cupkek packages
         /// the sample actually uses (foundation primitives + data layer + inventory +
         /// settings + scene transitions). Pure Luna-style: no third-party Asset Store
@@ -62,6 +70,12 @@ namespace CupkekGames.PackageManager.Editor
         //               via the External Dependencies section.
         public static readonly Entry[] Entries = new[]
         {
+            // ── Luna UI (headline package) ──
+            // Tagged Luna only so the PM window renders it as its own top
+            // section. GameFull packages transitively depend on Luna via
+            // their package.json so it auto-installs alongside them anyway.
+            new Entry("com.cupkekgames.luna",               "Luna UI",           PackageTags.Luna, PackageTags.All),
+
             // ── Foundation (needed by GameFull) ──
             new Entry("com.cupkekgames.singletons",         "Singleton",         PackageTags.GameFull, PackageTags.All),
             new Entry("com.cupkekgames.pool",               "Pool",              PackageTags.GameFull, PackageTags.All),
