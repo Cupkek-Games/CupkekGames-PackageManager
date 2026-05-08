@@ -142,6 +142,7 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.textpopup.damagenumberspro", "TextPopup.DamageNumbersPro", PackageTags.All),
             new Entry("com.cupkekgames.audio.sonity",       "Audio.Sonity",      PackageTags.All),
             new Entry("com.cupkekgames.animations.animancer","Animations.Animancer", PackageTags.All),
+            new Entry("com.cupkekgames.gamesave.luna",      "GameSave.Luna",     PackageTags.GameFull, PackageTags.All),
         };
 
         /// <summary>Entries with the given tag, in registration order.</summary>
