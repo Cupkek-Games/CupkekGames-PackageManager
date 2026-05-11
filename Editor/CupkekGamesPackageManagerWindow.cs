@@ -98,6 +98,12 @@ namespace CupkekGames.PackageManager.Editor
                 "automatically.");
             subtitle.AddToClassList("pm-header-subtitle");
             header.Add(subtitle);
+
+            Button learnMore = new Button(() =>
+                Application.OpenURL("https://docs.cupkek.games/luna/architecture"));
+            learnMore.text = "Learn more about the registry →";
+            learnMore.AddToClassList("pm-header-link");
+            header.Add(learnMore);
         }
 
         private void BuildContent(VisualElement root)
@@ -347,6 +353,18 @@ namespace CupkekGames.PackageManager.Editor
             VisualElement spacer = new VisualElement();
             spacer.style.flexGrow = 1f;
             row.Add(spacer);
+
+            // Per-row Docs link — opens docs.cupkek.games/<slug>. Hidden when
+            // the entry has no docs page yet (DocsUrl null).
+            if (!string.IsNullOrEmpty(entry.DocsUrl))
+            {
+                string docsUrl = entry.DocsUrl;
+                Button docs = new Button(() => Application.OpenURL(docsUrl));
+                docs.text = "Docs";
+                docs.AddToClassList("pm-row-docs-btn");
+                docs.tooltip = docsUrl;
+                row.Add(docs);
+            }
 
             if (isInstalled && _installedPackages.TryGetValue(entry.PackageId, out var info))
             {

@@ -20,6 +20,23 @@
     white-space: normal;
 }
 
+/* Inline link button under the subtitle paragraph — looks like a text
+ * link, not a button, so it doesn't compete with the toolbar actions. */
+.pm-header-link {
+    font-size: 11px;
+    -unity-font-style: bold;
+    color: var(--editor-link);
+    background-color: transparent;
+    border-width: 0;
+    padding: 4px 0 0 0;
+    margin: 0;
+    align-self: flex-start;
+}
+
+.pm-header-link:hover {
+    color: var(--editor-text-primary);
+}
+
 /* ── Section header ──
  * Splits the rows scroll into "CupkekGames Packages" and the
  * "External Dependencies (optional)" trailing section. */
@@ -225,6 +242,23 @@
     border-color: var(--editor-brand-border);
     background-color: var(--editor-brand-bg);
     color: var(--editor-text-secondary);
+}
+
+/* Per-row Docs link — minimal text-link styling so it doesn't compete
+ * with the install/update action button next to it. */
+.pm-row-docs-btn {
+    font-size: 11px;
+    color: var(--editor-link);
+    background-color: transparent;
+    border-width: 0;
+    min-width: 0;
+    min-height: 22px;
+    padding: 0 8px;
+    margin-right: 2px;
+}
+
+.pm-row-docs-btn:hover {
+    color: var(--editor-text-primary);
 }
 
 /* Per-row Update button — slightly wider to fit "Update v0.2.4" labels
