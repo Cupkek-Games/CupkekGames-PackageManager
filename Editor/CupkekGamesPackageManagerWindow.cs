@@ -24,7 +24,9 @@ namespace CupkekGames.PackageManager.Editor
         private Dictionary<string, CupkekGamesPackageInstaller.PackageVersionInfo> _installedPackages;
         private readonly List<Button> _rowInstallButtons = new();
 
-        [MenuItem("Tools/CupkekGames/Package Manager", false, 4)]
+        // Priority 100 — separated from the Luna windows group above. Package
+        // Manager is its own concept: cross-package install / update flow.
+        [MenuItem("Tools/CupkekGames/Package Manager", false, 100)]
         public static CupkekGamesPackageManagerWindow ShowWindow()
         {
             CupkekGamesPackageManagerWindow wnd = GetWindow<CupkekGamesPackageManagerWindow>();
