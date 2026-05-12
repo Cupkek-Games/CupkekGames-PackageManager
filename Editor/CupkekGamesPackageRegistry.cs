@@ -117,8 +117,7 @@ namespace CupkekGames.PackageManager.Editor
             // ── Resources (needed by GameFull) ──
             // Global / save-data-scoped player resources. Two independent sub-asmdefs
             // (Currencies, Experiences). Consumers cherry-pick which they reference.
-            // No docs page yet — add .WithDocs(DocsBase + "/resources") when one exists.
-            new Entry("com.cupkekgames.resources",          "Resources",         PackageTags.GameFull, PackageTags.All),
+            new Entry("com.cupkekgames.resources",          "Resources",         PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/resources"),
 
             // ── Inventory + RPG Stats (needed by GameFull) ──
             new Entry("com.cupkekgames.rpgstats",           "RPGStats",          PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/rpgstats"),
