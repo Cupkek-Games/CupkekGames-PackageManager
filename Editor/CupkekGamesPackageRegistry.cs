@@ -114,6 +114,12 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.gamesave",           "GameSave",          PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/gamesave"),
             new Entry("com.cupkekgames.newtonsoft",         "Newtonsoft",        PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/newtonsoft"),
 
+            // ── Resources (needed by GameFull) ──
+            // Global / save-data-scoped player resources. Two independent sub-asmdefs
+            // (Currencies, Experiences). Consumers cherry-pick which they reference.
+            // No docs page yet — add .WithDocs(DocsBase + "/resources") when one exists.
+            new Entry("com.cupkekgames.resources",          "Resources",         PackageTags.GameFull, PackageTags.All),
+
             // ── Inventory + RPG Stats (needed by GameFull) ──
             new Entry("com.cupkekgames.rpgstats",           "RPGStats",          PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/rpgstats"),
             new Entry("com.cupkekgames.inventory",          "Inventory",         PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/inventory"),
