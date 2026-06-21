@@ -404,4 +404,4 @@ Ecosystem integration:
 - [`packagemanager/README.md`](../README.md) — registry overview + naming convention rules
 - [`packagemanager/Editor/CupkekGamesPackageRegistry.cs`](../Editor/CupkekGamesPackageRegistry.cs) — where to register
 - [`cupkekgames-package-dev/README.md`](https://github.com/Cupkek-Games/cupkekgames-package-dev/blob/main/README.md) — submodule workflow
-- Luna's [`AGENTS.md`](https://github.com/Cupkek-Games/CupkekGames-Luna/blob/main/AGENTS.md) — Asset Store distribution model + cross-package URL rules
+- [docs.cupkek.games/luna/architecture](https://docs.cupkek.games/luna/architecture) — Asset Store distribution model (Luna's AGENTS.md, which covered this + cross-package URL rules, was removed 2026-06-11; recover from luna git history if needed)
