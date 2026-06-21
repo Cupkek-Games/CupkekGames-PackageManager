@@ -9,8 +9,9 @@ namespace CupkekGames.PackageManager.Editor
         /// <summary>
         /// The Luna UI package itself. Headline UI Toolkit framework — pulls in its
         /// bundled foundation deps (singletons, pool, fadeables, keyvaluedatabases,
-        /// prefabloaders, input, etc.) transitively via package.json. Shown as its
-        /// own top section in the Package Manager window.
+        /// prefabloaders, input, data, graphs, editorui, editorinspector, etc.)
+        /// transitively via package.json. Shown as its own top section in the
+        /// Package Manager window.
         /// </summary>
         public const string Luna = "Luna";
 
@@ -111,8 +112,14 @@ namespace CupkekGames.PackageManager.Editor
             // ── Data layer (needed by GameFull) ──
             new Entry("com.cupkekgames.services",           "ServiceLocator",    PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/servicelocator"),
             new Entry("com.cupkekgames.data",               "Data",              PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/data"),
+            // Graph-editing foundation. A Luna dependency (drives the navigation
+            // graph), so tagged like the other Luna-required deps. No docs page yet.
+            new Entry("com.cupkekgames.graphs",             "Graphs",            PackageTags.GameFull, PackageTags.All),
             new Entry("com.cupkekgames.gamesave",           "GameSave",          PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/gamesave"),
             new Entry("com.cupkekgames.newtonsoft",         "Newtonsoft",        PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/newtonsoft"),
+            // Optional Newtonsoft <-> KeyValueDatabase bridge (serializer adapter).
+            // Not part of the GameFull sample — All only.
+            new Entry("com.cupkekgames.keyvaluedatabases.newtonsoft", "KeyValueDatabase.Newtonsoft", PackageTags.All).WithDocs(DocsBase + "/core/keyvaluedatabase/newtonsoft"),
 
             // ── Resources (needed by GameFull) ──
             // Global / save-data-scoped player resources. Two independent sub-asmdefs

@@ -225,7 +225,8 @@ namespace CupkekGames.PackageManager.Editor
                 Label lunaHeaderSub = new Label(
                     "Headline UI Toolkit framework. Bundled foundation deps " +
                     "(Singletons, Pool, Fadeables, KeyValueDatabases, " +
-                    "PrefabLoaders, Input, …) install transitively.");
+                    "PrefabLoaders, Input, Data, Graphs, EditorUI, …) install " +
+                    "transitively.");
                 lunaHeaderSub.AddToClassList("pm-section-header-sub");
                 lunaHeader.Add(lunaHeaderSub);
                 _rowsContainer.Add(lunaHeader);
