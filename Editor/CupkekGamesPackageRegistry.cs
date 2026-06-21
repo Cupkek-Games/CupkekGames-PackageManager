@@ -113,8 +113,8 @@ namespace CupkekGames.PackageManager.Editor
             new Entry("com.cupkekgames.services",           "ServiceLocator",    PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/servicelocator"),
             new Entry("com.cupkekgames.data",               "Data",              PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/data"),
             // Graph-editing foundation. A Luna dependency (drives the navigation
-            // graph), so tagged like the other Luna-required deps. No docs page yet.
-            new Entry("com.cupkekgames.graphs",             "Graphs",            PackageTags.GameFull, PackageTags.All),
+            // graph), so tagged like the other Luna-required deps.
+            new Entry("com.cupkekgames.graphs",             "Graphs",            PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/graphs"),
             new Entry("com.cupkekgames.gamesave",           "GameSave",          PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/gamesave"),
             new Entry("com.cupkekgames.newtonsoft",         "Newtonsoft",        PackageTags.GameFull, PackageTags.All).WithDocs(DocsBase + "/newtonsoft"),
             // Optional Newtonsoft <-> KeyValueDatabase bridge (serializer adapter).
