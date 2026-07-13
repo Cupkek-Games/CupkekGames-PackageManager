@@ -95,6 +95,12 @@ namespace CupkekGames.PackageManager.Editor
             // Tagged Luna only so the PM window renders it as its own top
             // section. GameFull packages transitively depend on Luna via
             // their package.json so it auto-installs alongside them anyway.
+            // PREMIUM: Luna is deliberately NOT on the UPM registry (the
+            // registry 404 for com.cupkekgames.luna is by design, permanent).
+            // Owner projects install it via git URL; customers get it from
+            // the Unity Asset Store. In a project without Luna already
+            // present from one of those channels, this row's Install button
+            // and the "Install All" batch fail on luna — expected, not a bug.
             new Entry("com.cupkekgames.luna",               "Luna UI",           PackageTags.Luna, PackageTags.All).WithDocs(DocsBase + "/luna/architecture"),
 
             // ── Foundation (needed by GameFull) ──
