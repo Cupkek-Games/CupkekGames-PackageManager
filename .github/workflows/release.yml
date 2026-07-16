@@ -1,4 +1,4 @@
-﻿name: Release
+name: Release
 
 # Tag-driven publish: packs the package and uploads tarball + sidecar JSON to
 # the GitHub Release. The Cupkek-Games/.github reusable workflow does all the
@@ -15,6 +15,7 @@ on:
 
 jobs:
   release:
-    uses: Cupkek-Games/.github/.github/workflows/upm-release.yml@main
+    uses: Cupkek-Games/.github/.github/workflows/upm-release.yml@main
+    secrets: inherit
     permissions:
       contents: write
