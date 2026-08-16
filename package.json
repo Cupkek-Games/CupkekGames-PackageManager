@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "com.cupkekgames.packagemanager",
   "displayName": "CupkekGames Package Manager",
   "version": "0.4.3",
@@ -6,7 +6,7 @@
     "name": "CupkekGames",
     "url": "https://www.docs.cupkek.games"
   },
-  "unity": "6000.0",
+  "unity": "6000.5",
   "documentationUrl": "https://docs.cupkek.games/",
   "description": "Editor window + scoped-registry installer for the CupkekGames UPM packages. Tools > CupkekGames > Package Manager. Self-bootstraps the docs.cupkek.games/upm registry into Packages/manifest.json. Install this package first (via git URL or local file:) before the others.",
   "keywords": [

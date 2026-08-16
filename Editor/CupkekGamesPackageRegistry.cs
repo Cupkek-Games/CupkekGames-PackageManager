@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Linq;
+using Unity.Scripting.LifecycleManagement;
 
 namespace CupkekGames.PackageManager.Editor
 {
@@ -33,7 +34,7 @@ namespace CupkekGames.PackageManager.Editor
         public const string All = "All";
     }
 
-    public static class CupkekGamesPackageRegistry
+    public static partial class CupkekGamesPackageRegistry
     {
         public readonly struct Entry
         {
@@ -89,6 +90,7 @@ namespace CupkekGames.PackageManager.Editor
         //               (combat, character, vfx, etc.) need third-party deps;
         //               consumers using "Install All" must install those manually
         //               via the External Dependencies section.
+        [NoAutoStaticsCleanup]
         public static readonly Entry[] Entries = new[]
         {
             // ── Luna UI (headline package) ──

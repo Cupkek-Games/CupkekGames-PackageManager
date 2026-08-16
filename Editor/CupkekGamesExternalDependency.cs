@@ -1,5 +1,6 @@
 #if UNITY_EDITOR
 using System.Collections.Generic;
+using Unity.Scripting.LifecycleManagement;
 
 namespace CupkekGames.PackageManager.Editor
 {
@@ -41,8 +42,9 @@ namespace CupkekGames.PackageManager.Editor
         public bool IsPaid;
     }
 
-    public static class CupkekGamesExternalDependencyRegistry
+    public static partial class CupkekGamesExternalDependencyRegistry
     {
+        [NoAutoStaticsCleanup]
         private static readonly CupkekGamesExternalDependency[] _all = new[]
         {
             new CupkekGamesExternalDependency

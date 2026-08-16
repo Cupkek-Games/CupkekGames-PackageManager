@@ -7,10 +7,11 @@ using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEditor.PackageManager.Requests;
 using UnityEngine;
+using Unity.Scripting.LifecycleManagement;
 
 namespace CupkekGames.PackageManager.Editor
 {
-    public static class CupkekGamesPackageInstaller
+    public static partial class CupkekGamesPackageInstaller
     {
         private const string LastErrorKey = "CupkekGames_PackageInstallLastError";
 
@@ -45,11 +46,17 @@ namespace CupkekGames.PackageManager.Editor
                 Installed != Latest;
         }
 
+        [AutoStaticsCleanup]
         private static ListRequest _listRequest;
+        [AutoStaticsCleanup]
         private static AddRequest _addRequest;
+        [AutoStaticsCleanup]
         private static AddAndRemoveRequest _addAndRemoveRequest;
+        [AutoStaticsCleanup]
         private static Action<Dictionary<string, PackageVersionInfo>> _listCallback;
+        [AutoStaticsCleanup]
         private static Action<bool, string> _addCallback;
+        [AutoStaticsCleanup]
         private static Action<bool, string> _addAndRemoveCallback;
 
         public static bool IsAddInFlight => _addRequest != null || _addAndRemoveRequest != null;
